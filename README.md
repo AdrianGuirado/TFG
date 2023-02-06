@@ -1,5 +1,12 @@
 # TFG
 
+Explicació:
+
+Amb el codi de Python, envio missatges al PORT COM6, el dispositiu solicitador detecta la comanda amb Arduino i envia un paquet al dispositiu Enviador indicant que ha de fer.
+
+Es generen arxius .csv amb les dades, que serà útil per generar un gràfic.
+
+
 Bugs per solucionar:
 
 - Al connectar per primera vegada la placa, envia una línea de bytes que no es sempre la mateixa (crec), el programa ha de saltar-la.
