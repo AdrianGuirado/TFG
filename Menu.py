@@ -97,20 +97,14 @@ while True:
         file_path = "data" + "_" + horizontal + "_" + vertical + "_" + muestra + ".csv"
 
         if os.path.exists(file_path):
-            # Lists to store the data
             x = []
             y = []
-            # Open the file and read the data
             with open(file_path,"r", newline='') as csvfile:
-                # Create a CSV reader object
                 reader = csv.reader(csvfile,delimiter=';')
-                # Skip the header row
                 next(reader)
-                    # Extract the data from the file
                 for row in reader:
                     x.append(horizontal)
                     y.append(int(row[0]))
-                # Create the graph
             mean = np.mean(y)
             var = np.var(y)
             plt.plot(x, y,"o")
