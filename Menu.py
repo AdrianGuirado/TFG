@@ -2,6 +2,8 @@ import serial, time, csv, os
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import pandas as pd
+import glob
 
 def menu():
     print("Menu:")
@@ -162,61 +164,68 @@ while True:
         plt.plot(x,snrmedia,"*")
         plt.show()
     elif choice == '6':
-        list = os.listdir()
-        csvfiles = []
-        verticales = []
-        medias = []
-        horizontales = []
-        for file in list:
-            if file.endswith('.csv'):
-                parts = file.split('_')
-                csvfiles.append(file)
-                if parts[2] not in verticales:
-                    verticales.append(parts[2])
-                if parts[1] not in horizontales:
-                    horizontales.append(parts[1])
-        rssimedia = []
-        rssivarianza = []
-        snrmedia = []
-        snrvarianza = []
-        x = []
-        horizontales = [int(numero) for numero in horizontales]
-        horizontales = sorted(horizontales)
-        horizontales = [str(numero) for numero in horizontales]
-        print(horizontales)
-        print(verticales)
-        for i in horizontales:
-            for j in verticales:
-                rssinums = []
-                snrnums = []
-                for file in csvfiles:
-                    partes = file.split('_')
-                    if partes[1] == i and partes[2] == j:
-                        with open(file,"r") as csvfile:
-                            reader = csv.reader(csvfile,delimiter=';')
-                            next(reader)
-                            for row in reader:
-                                rssinums.append(int(row[0]))
-                                snrnums.append(int(row[1])) 
-                if rssinums and snrnums:
-                    rssimedia.append(np.mean(rssinums))
-                    snrmedia.append(np.mean(snrnums))
-                    x.append(i)
+        path = os.getcwd()
+        csv_files = glob.glob(os.path.join(path, "*.csv"))
+
+        dic=dict()
 
 
-        x = [int(n) for n in x]
-        rssimedia = [float(n) for n in rssimedia]
-        snrmedia = [float(n)for n in snrmedia]
+        for e in csv_files:
+            nombre=e.split("\\")
+            docu=nombre[-1]
+            Vertical=docu.split("_")[-2]
+            Horitzonal=docu.split("_")[-3]
+            if Vertical not in dic:
+                dic[Vertical]=dict()
+                dic[Vertical][Horitzonal]=[docu]    
+            else:
+                if Horitzonal not in dic[Vertical]:
+                    dic[Vertical][Horitzonal]=[docu]
+                else:
+                    dic[Vertical][Horitzonal].append(docu)
+                
+        dicDatRSSI=dict()
+        dicDatSNR=dict()
+        DatosRSSI=[]
+        DatosSNR=[]
+        for e in dic:
+            l1=[]
+            l11=[]
+            l2=[]
+            l22=[]
+            for i in dic[e]:
+                vacio=pd.DataFrame()
+                for j in dic[e][i]:
+                    arch=pd.read_csv(j,sep=';',engine='python')
+                    vacio=pd.concat([vacio,arch])
+                DatosRSSI.append([vacio['RSSI'].mean(),i,e])
+                DatosSNR.append([vacio['SNR'].mean(),i,e])
+                #l1.append([vacio['RSSI'].mean(),i,e])
+                #l11.append((e,i))
+                #l2.append([vacio['SNR'].mean(),i,e])
+                #l22.append((e,i))
+            #DatosRSSI.append(l1)
+            #DatosSNR.append(l2)
+                
 
-        print(rssimedia)
-        print(snrmedia)
-        print(x)
+        RSSI = pd.DataFrame(DatosRSSI)
+        SNR = pd.DataFrame(DatosSNR)
+        RSSI[1] = RSSI[1].astype('float64')
+        SNR[1] = SNR[1].astype('float64')
 
-        fig, (pltr, plts) = plt.subplots(1, 2)
+        RSSI.rename(columns={0:'RSSI',
+                                1:'Eje Horizontal',2:'Eje Vertical'},
+                    inplace=True)
+        SNR.rename(columns={0:'SNR',
+                                1:'Eje Horizontal',2:'Eje Vertical'},
+                    inplace=True)
+        RSSI = RSSI.sort_values('Eje Horizontal')
+        SNR = SNR.sort_values('Eje Horizontal')
 
+        for value in RSSI['Eje Vertical'].unique():
+            temp_df = RSSI[RSSI['Eje Vertical'] == value]
+            plt.plot(temp_df['Eje Horizontal'], temp_df['RSSI'])
 
-        pltr.plot(x,rssimedia,"o")
-        plts.plot(x,snrmedia,"*")
         plt.show()
 
     else:
