@@ -9,7 +9,7 @@ Es generen arxius .csv amb les dades, que serà útil per generar un gràfic.
 
 Bugs per solucionar:
 
-- Al connectar per primera vegada la placa, envia una línea de bytes que no es sempre la mateixa (crec), el programa ha de saltar-la.
+- Al connectar per primera vegada la placa, envia una línía de bytes que no es sempre la mateixa (crec), el programa ha de saltar-la.
 - Quan hi ha transmissió i un paquet falla, no incluir-ho al fitxer .csv
 
 Coses per afegir:
