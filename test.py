@@ -129,11 +129,11 @@ while True:
         else:
             print("File does not exist")            
     elif choice == '5':
-        horizontal = input("Ingrese distancia horizontal: ")
 
+        horizontal = input("Insert horitzontal distance: ")
         list = os.listdir()
         csvfiles = []
-        nums = []
+        verticales = []
         medias = []
 
         for file in list:
@@ -141,19 +141,20 @@ while True:
                 parts = file.split('_')
                 if parts[1] == horizontal:
                     csvfiles.append(file)
-                    if parts[2] not in nums:
-                        nums.append(parts[2])
+                    if parts[2] not in verticales:
+                        verticales.append(parts[2])
         rssimedia = []
         rssivarianza = []
         snrmedia = []
         snrvarianza = []
-        lineax = []
-        for num in nums:
+        x = []
+
+        for i in verticales:
             rssinums = []
             snrnums = []
             for file in csvfiles:
                 partes = file.split('_')
-                if partes[2] == num:
+                if partes[2] == i:
                     with open(file,"r") as csvfile:
                         reader = csv.reader(csvfile,delimiter=';')
                         next(reader)
@@ -162,42 +163,41 @@ while True:
                             snrnums.append(int(row[1]))
             rssimedia.append(np.mean(rssinums))
             snrmedia.append(np.mean(snrnums))
-            lineax.append(horizontal)
-        plt.plot(lineax,rssimedia,"o")
-        plt.plot(lineax,snrmedia,"*")
+            x.append(horizontal)
+        plt.plot(x,rssimedia,"o")
+        plt.plot(x,snrmedia,"*")
         plt.show()
     elif choice == '6':
         list = os.listdir()
         csvfiles = []
-        nums = []
+        verticales = []
         medias = []
-        numeros = []
+        horizontales = []
         for file in list:
             if file.endswith('.csv'):
                 parts = file.split('_')
                 csvfiles.append(file)
-                if parts[2] not in nums:
-                    nums.append(parts[2])
-                if parts[1] not in numeros:
-                    numeros.append(parts[1])
+                if parts[2] not in verticales:
+                    verticales.append(parts[2])
+                if parts[1] not in horizontales:
+                    horizontales.append(parts[1])
         rssimedia = []
         rssivarianza = []
         snrmedia = []
         snrvarianza = []
-        lineax = []
-        numeros = [int(numero) for numero in numeros]
-        numeros = sorted(numeros)
-        print(numeros)
-        numeros = [str(numero) for numero in numeros]
-        print(numeros)
-        print(nums)
-        for numero in numeros:
-            for num in nums:
+        x = []
+        horizontales = [int(numero) for numero in horizontales]
+        horizontales = sorted(horizontales)
+        horizontales = [str(numero) for numero in horizontales]
+        print(horizontales)
+        print(verticales)
+        for i in horizontales:
+            for j in verticales:
                 rssinums = []
                 snrnums = []
                 for file in csvfiles:
                     partes = file.split('_')
-                    if partes[1] == numero and partes[2] == num:
+                    if partes[1] == i and partes[2] == j:
                         with open(file,"r") as csvfile:
                             reader = csv.reader(csvfile,delimiter=';')
                             next(reader)
@@ -207,20 +207,25 @@ while True:
                 if rssinums and snrnums:
                     rssimedia.append(np.mean(rssinums))
                     snrmedia.append(np.mean(snrnums))
-                    lineax.append(numero)
+                    x.append(i)
+
+
+        x = [int(n) for n in x]
+        rssimedia = [float(n) for n in rssimedia]
+        snrmedia = [float(n)for n in snrmedia]
+
         print(rssimedia)
         print(snrmedia)
-        print(lineax)
+        print(x)
 
-        lineax = [int(numero) for numero in lineax]
-        rssimedia = [int(n) for n in rssimedia]
-        for i, j in zip(lineax, rssimedia):
-            plt.text(i, j, f'{j}')
-        plt.plot(lineax,snrmedia,"o")
-    
+        fig, (pltr, plts) = plt.subplots(1, 2)
+
+
+        pltr.plot(x,rssimedia,"o")
+        plts.plot(x,snrmedia,"*")
         plt.show()
+
     else:
         print("Invalid choice. Please try again.")
-
 
 
