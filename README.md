@@ -18,3 +18,8 @@ Coses per afegir:
 - Fer millor els gràfics
 - Fer pantalla amb més informació sobre els gràfics
 - Fer línea amb el model de propagació i veure la variança de la funció.
+- Realitzar el codi dels apartats 4 i 5 amb la llibreria Pandas
+
+Actualitzacions
+
+7/2/2023 He descobert la llibreria Pandas, he fet l'apartat 6 del menú utilitzant aquesta llibreria, falta implementar a 4 i 5.
