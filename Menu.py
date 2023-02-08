@@ -12,9 +12,10 @@ def menu():
     print("3. Deleting a data file")
     print("4. Generate a graphic from a data file")
     print("5. Generate a graphic with all data in X distance")
-    print("6. Generate a graphic from all the data files")
+    print("6. Generate a graphic with all data in Y distance")
+    print("7. Generate a graphic with all data")
 
-    choice = input("Enter your choice (1-6): ")
+    choice = input("Enter your choice (1-7): ")
     return choice
 
 def convert(bytevalue):
@@ -111,10 +112,12 @@ while True:
                     y.append(int(row[0]))
             mean = np.mean(y)
             var = np.var(y)
+
             plt.plot(x, y,"o")
             plt.xlabel('X')
             plt.ylabel('Y')
             plt.title('Graph of X vs Y')
+
             plt.annotate(f'media = {mean:.2f}', xy=(1, 0), xycoords='axes fraction',
                     xytext=(-20, 20), textcoords='offset points',
                     ha='right', va='bottom',
@@ -123,11 +126,13 @@ while True:
                     xytext=(-20, 40), textcoords='offset points',
                     ha='right', va='bottom',
                     bbox=dict(boxstyle='round,pad=0.5', fc='red', alpha=0.7))
+
             plt.show()
         else:
             print("File does not exist")    
 
     elif choice == '5':
+
         path = os.getcwd()
         csv_files = glob.glob(os.path.join(path, "*.csv"))
         h = input("Insert horitzontal distance: ")
@@ -167,13 +172,70 @@ while True:
         RSSI.rename(columns={0:'RSSI', 1:'Vertical'},inplace = True)
         SNR.rename(columns={0:'RSSI', 1:'Vertical'},inplace = True)
 
-        print(RSSI['RSSI'])
+        
 
+        for value in RSSI['RSSI']:
+            plt.plot(h,value,"o")
+        plt.xlabel('Distancia')
+        plt.ylabel('RSSI')
+        plt.title('Gràfic de la RSSI en funció de la distancia')
+        plt.show()
         for value in RSSI['RSSI']:
             plt.plot(h,value,"o")
         plt.show()
 
     elif choice == '6':
+        path = os.getcwd()
+        csv_files = glob.glob(os.path.join(path, "*.csv"))
+        v = input("Insert vertical distance: ")
+
+        dic = dict()
+
+        for e in csv_files:
+            nombre=e.split("\\")
+            docu=nombre[-1]
+            Vertical = docu.split("_")[-2]
+            Horizontal = docu.split("_")[-3]
+            if Vertical == v:
+                if Horizontal not in dic:
+                    dic[Horizontal] = [docu]
+                else:
+                    dic[Horizontal].append(docu)
+
+        dicDatRSSI=dict()
+        dicDatSNR=dict()
+        DatosRSSI=[]
+        DatosSNR=[]
+
+        for e in dic:
+            vacio = pd.DataFrame()
+            for i in dic[e]:
+                arch = pd.read_csv(i,sep=';', engine="python")
+                vacio = pd.concat([vacio,arch])
+            DatosRSSI.append([vacio['RSSI'].mean(),e])
+            DatosSNR.append([vacio['SNR'].mean(),e])
+
+        RSSI = pd.DataFrame(DatosRSSI)
+        SNR = pd.DataFrame(DatosSNR)
+
+
+
+        RSSI.rename(columns={0:'RSSI', 1:'Horizontal'}, inplace = True)
+        SNR.rename(columns={0:'RSSI', 1:'Horizontal'}, inplace = True)
+
+        RSSI = RSSI.astype('float64')
+        SNR = SNR.astype('float64')
+
+        RSSI = RSSI.sort_values(by='Horizontal')
+        SNR = SNR.sort_values(by='Horizontal')
+
+
+        plt.plot(RSSI['Horizontal'],RSSI['RSSI'])
+        plt.show()
+        plt.plot(SNR['Horizontal'],SNR['RSSI'])
+        plt.show()
+
+    elif choice == '7':
 
         path = os.getcwd()
         csv_files = glob.glob(os.path.join(path, "*.csv"))
@@ -220,17 +282,27 @@ while True:
         SNR.rename(columns={0:'SNR',
                                 1:'Eje Horizontal',2:'Eje Vertical'},
                     inplace=True)
+
         RSSI = RSSI.sort_values('Eje Horizontal')
         SNR = SNR.sort_values('Eje Horizontal')
 
-
         for value in RSSI['Eje Vertical'].unique():
             temp_df = RSSI[RSSI['Eje Vertical'] == value]
-            plt.plot(temp_df['Eje Horizontal'], temp_df['RSSI'])
+            plt.plot(temp_df['Eje Horizontal'], temp_df['RSSI'], label=f'Vertical = {value} metres')
+        plt.legend()
+        plt.show()
+
+        for value in SNR['Eje Vertical'].unique():
+            print(value)
+            temp_df = SNR[SNR['Eje Vertical'] == value]
+            plt.plot(temp_df['Eje Horizontal'], temp_df['SNR'], label=f'V = {value}')
+        plt.legend()
         plt.show()
 
     else:
         print("Invalid choice. Please try again.")
+
+
 
 
 
