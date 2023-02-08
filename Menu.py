@@ -76,6 +76,7 @@ while True:
                 writer.writerow([convert(data)])
                 print(convert(data))
     elif choice == '3':
+
         # Prompt the user to select a file to delete
         horizontal = input("Ingrese distancia horizontal: ")
         vertical = input("Ingrese distancia vertical: ")
@@ -91,6 +92,7 @@ while True:
                 print("Deletion cancelled.")
         else:
             print("File does not exist")
+
     elif choice == '4':
 
         horizontal = input("Ingrese distancia horizontal: ")
@@ -123,52 +125,60 @@ while True:
                     bbox=dict(boxstyle='round,pad=0.5', fc='red', alpha=0.7))
             plt.show()
         else:
-            print("File does not exist")            
+            print("File does not exist")    
+
     elif choice == '5':
+        path = os.getcwd()
+        csv_files = glob.glob(os.path.join(path, "*.csv"))
+        h = input("Insert horitzontal distance: ")
 
-        horizontal = input("Insert horitzontal distance: ")
-        list = os.listdir()
-        csvfiles = []
-        verticales = []
-        medias = []
+        dic = dict()
 
-        for file in list:
-            if file.endswith('.csv'):
-                parts = file.split('_')
-                if parts[1] == horizontal:
-                    csvfiles.append(file)
-                    if parts[2] not in verticales:
-                        verticales.append(parts[2])
-        rssimedia = []
-        rssivarianza = []
-        snrmedia = []
-        snrvarianza = []
-        x = []
+        for e in csv_files:
+            nombre=e.split("\\")
+            docu=nombre[-1]
+            Vertical = docu.split("_")[-2]
+            Horizontal= docu.split("_")[-3]
+            if Horizontal == h:
+                if Vertical not in dic:
+                    dic[Vertical] = dict()
+                    dic[Vertical] = [docu]
+                else:
+                    dic[Vertical].append(docu)
 
-        for i in verticales:
-            rssinums = []
-            snrnums = []
-            for file in csvfiles:
-                partes = file.split('_')
-                if partes[2] == i:
-                    with open(file,"r") as csvfile:
-                        reader = csv.reader(csvfile,delimiter=';')
-                        next(reader)
-                        for row in reader:
-                            rssinums.append(int(row[0]))
-                            snrnums.append(int(row[1]))
-            rssimedia.append(np.mean(rssinums))
-            snrmedia.append(np.mean(snrnums))
-            x.append(horizontal)
-        plt.plot(x,rssimedia,"o")
-        plt.plot(x,snrmedia,"*")
+        dicDatRSSI=dict()
+        dicDatSNR=dict()
+        DatosRSSI=[]
+        DatosSNR=[]
+
+        for e in dic:
+            vacio=pd.DataFrame()
+            for i in dic[e]:
+                arch=pd.read_csv(i,sep=';',engine='python')
+                vacio=pd.concat([vacio,arch])
+            DatosRSSI.append([vacio['RSSI'].mean(),e])
+            DatosSNR.append([vacio['SNR'].mean(),e])
+
+        RSSI = pd.DataFrame(DatosRSSI)
+        SNR = pd.DataFrame(DatosSNR)
+        RSSI[1] = RSSI[1].astype('float64')
+        SNR[1] = SNR[1].astype('float64')
+
+        RSSI.rename(columns={0:'RSSI', 1:'Vertical'},inplace = True)
+        SNR.rename(columns={0:'RSSI', 1:'Vertical'},inplace = True)
+
+        print(RSSI['RSSI'])
+
+        for value in RSSI['RSSI']:
+            plt.plot(h,value,"o")
         plt.show()
+
     elif choice == '6':
+
         path = os.getcwd()
         csv_files = glob.glob(os.path.join(path, "*.csv"))
 
         dic=dict()
-
 
         for e in csv_files:
             nombre=e.split("\\")
@@ -183,16 +193,13 @@ while True:
                     dic[Vertical][Horitzonal]=[docu]
                 else:
                     dic[Vertical][Horitzonal].append(docu)
-                
+
         dicDatRSSI=dict()
         dicDatSNR=dict()
         DatosRSSI=[]
         DatosSNR=[]
+
         for e in dic:
-            l1=[]
-            l11=[]
-            l2=[]
-            l22=[]
             for i in dic[e]:
                 vacio=pd.DataFrame()
                 for j in dic[e][i]:
@@ -200,18 +207,12 @@ while True:
                     vacio=pd.concat([vacio,arch])
                 DatosRSSI.append([vacio['RSSI'].mean(),i,e])
                 DatosSNR.append([vacio['SNR'].mean(),i,e])
-                #l1.append([vacio['RSSI'].mean(),i,e])
-                #l11.append((e,i))
-                #l2.append([vacio['SNR'].mean(),i,e])
-                #l22.append((e,i))
-            #DatosRSSI.append(l1)
-            #DatosSNR.append(l2)
                 
-
         RSSI = pd.DataFrame(DatosRSSI)
         SNR = pd.DataFrame(DatosSNR)
         RSSI[1] = RSSI[1].astype('float64')
         SNR[1] = SNR[1].astype('float64')
+        print(RSSI)
 
         RSSI.rename(columns={0:'RSSI',
                                 1:'Eje Horizontal',2:'Eje Vertical'},
@@ -222,13 +223,17 @@ while True:
         RSSI = RSSI.sort_values('Eje Horizontal')
         SNR = SNR.sort_values('Eje Horizontal')
 
+
         for value in RSSI['Eje Vertical'].unique():
             temp_df = RSSI[RSSI['Eje Vertical'] == value]
             plt.plot(temp_df['Eje Horizontal'], temp_df['RSSI'])
-
         plt.show()
 
     else:
         print("Invalid choice. Please try again.")
+
+
+
+
 
 
