@@ -23,3 +23,4 @@ Coses per afegir:
 Actualitzacions
 
 7/2/2023 He descobert la llibreria Pandas, he fet l'apartat 6 del menú utilitzant aquesta llibreria, falta implementar a 4 i 5.
+8/2/2023 Actualització codi apartat 5.
