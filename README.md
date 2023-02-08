@@ -15,10 +15,10 @@ Bugs per solucionar:
 Coses per afegir:
 
 - Millorar optimització codi
-- Fer millor els gràfics
+- Fer millor els gràfics. 
 - Fer pantalla amb més informació sobre els gràfics
 - Fer línea amb el model de propagació i veure la variança de la funció.
-- Realitzar el codi dels apartats 4 i 5 amb la llibreria Pandas
+- Realitzar el codi dels apartats 4 i 5 amb la llibreria Pandas. FET 
 
 Actualitzacions
 
